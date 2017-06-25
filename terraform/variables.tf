@@ -1,3 +1,8 @@
+variable "api_gateway_deployment_stage" {
+  description = "The name of the stage to deploy for the API Gateway which will form part of the invocation URL."
+  default = "dev"
+}
+
 variable "aws_profile" {
   description = "The name of the profile to use to connect to AWS as defined in ~/.aws/credentials."
   default = "default"
