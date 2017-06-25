@@ -6,7 +6,7 @@ A REST API providing a simple method to advise upstream clients (i.e. proxies) w
 
 This code is intended to be deployed within AWS to leverage API Gateway, ElastiCache and Lambda but can also be run as a standalone webserver under Node 6.10+. You will also need a Git client installed on your system.
 
-To deploy within AWS you should first download Terraform v0.9.4 or later: [https://www.terraform.io/downloads.html]
+To deploy within AWS you should first download Terraform v0.9.4 or later: https://www.terraform.io/downloads.html
 
 ## Getting started
 
@@ -21,6 +21,7 @@ cd urlinfo
 If you would like to proceed with the recommended approach of deploying this service in AWS, you will need an Amazon Web Services account and an IAM user defined with an API key.
 
 If you haven't yet downloaded Terraform v0.9.4 or later then please do so and extract the binary from the ZIP file anywhere within your PATH.
+
 The recommended approach is to first download Terraform as above. 
 
 The Terraform scripts included in this repository will:
@@ -48,11 +49,11 @@ Alternatively if you wish to make customisations such as the region:
 terraform apply -var 'aws_profile=<name-of-your-profile-defined-in-.aws-credentials>' -var 'aws_region=us-east-1'
 ```
 
-Once completed you should be presented with the API Gateway invocation path which takes the form [https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev].
+Once completed you should be presented with the API Gateway invocation path which takes the form https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev.
 
 ### Standalone
 
-You should download and install NodeJS 6.10+ and optionally Redis 3.2+ ([https://redis.io/download]) to run a local in-memory database to hold the URL information.
+You should download and install NodeJS 6.10+ and optionally Redis 3.2+ (https://redis.io/download) to run a local in-memory database to hold the URL information.
 
 URL Info is configured by the use of environment variables:
 
