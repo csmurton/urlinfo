@@ -1,0 +1,34 @@
+{
+  "name": "urlinfo",
+  "version": "1.0.0",
+  "description": "Service to advise upstream clients of malicious URLs.",
+  "main": "url-info.js",
+  "dependencies": {
+    "aws-serverless-express": "^3.0.2",
+    "bluebird": "^3.5.0",
+    "crypto": "0.0.3",
+    "download": "^6.2.3",
+    "express": "^4.15.3",
+    "fs": "0.0.1-security",
+    "is-lambda": "^1.0.1",
+    "jsonify": "0.0.0",
+    "path": "^0.12.7",
+    "redis": "^2.7.1",
+    "url": "^0.11.0",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csmurton/urlinfo.git"
+  },
+  "author": "Chris Murton <chris@chrismurton.co.uk>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/csmurton/urlinfo/issues"
+  },
+  "homepage": "https://github.com/csmurton/urlinfo#readme"
+}
