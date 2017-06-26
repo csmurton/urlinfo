@@ -7,6 +7,10 @@ resource "aws_api_gateway_deployment" "urlinfo" {
   depends_on = ["aws_api_gateway_integration.urlinfo_root_integration"]
   rest_api_id = "${aws_api_gateway_rest_api.urlinfo.id}"
   stage_name = "${var.api_gateway_deployment_stage}"
+
+  provisioner "local-exec" {
+    command = "/usr/bin/curl -q ${aws_api_gateway_deployment.urlinfo.invoke_url}/urlloader"
+  }
 }
 
 # API Gateway resources

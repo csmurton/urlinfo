@@ -1,7 +1,7 @@
 resource "aws_elasticache_subnet_group" "urlinfo_subnet_group" {
   name            = "${var.project_name}-subnet-group"
   description     = "ElastiCache subnet group for use with urlinfo"
-  subnet_ids      = ["${data.aws_subnet_ids.default.ids}"]
+  subnet_ids      = ["${aws_subnet.urlinfo_subnet.id}"]
 }
 
 resource "aws_elasticache_cluster" "urlinfo_cluster" {

@@ -29,10 +29,12 @@ The recommended approach is to first download Terraform as above.
 
 The Terraform scripts included in this repository will:
 
- * Discover the AWS default VPC and subnets in the account and region you run it in (defaults to eu-west-1)
+ * Discover the AWS default VPC in the account and region you run it in (defaults to eu-west-1)
+ * Create a subnet in a random availability zone in the AWS default VPC
+ * Create a NAT Gateway to allow the demonstration URL Blacklist import route to function in the default subnet in the same AZ as the custom subnet
  * Create a VPC security group for communication between the Lambda function and the Redis ElastiCache cluster
- * Create an ElastiCache subnet group incorporating each subnet in the discovered default VPC
- * Create a Redis ElastiCache cluster defaulting to a single node
+ * Create an ElastiCache subnet group incorporating the newly created subnet in the discovered default VPC
+ * Create a Redis ElastiCache cluster node
  * Create an IAM role for the Lambda function to run under
  * Create a Lambda function by zipping and deploying all code in the ../node path
  * Create an IAM role for API Gateway to use for invoking the Lambda function
@@ -76,13 +78,16 @@ If you are comfortable with the defaults, run the following from the 'urlinfo' d
 nodejs node/url-info.js
 ```
 
+To seed your configured Redis instance with a demonstration URL blocklist, run:
+
+```
+curl http://localhost:5000/urlloader
+{"message":"URLs imported to database successfully."}
+```
+
 ## Known limitations
 
  * Error handling in the event of the Redis backend being unavailable due to timeout is incomplete.
  * The only database provider currently supported is Redis but most backends that support CRUD operations should be suitable.
-
-
-## To-do
-
- * Provide mechanism for importing of sample URL tokens to represent blacklisted paths
-
+ * A simple, functional API route and piece of code to load sample data into the Redis backend has been included. In production this would be handled separately and/or improved to stream the blacklist entries to Redis thereby reducing memory footprint during the loading exercise.
+ * AWS API Gateway has an integration timeout of 30 seconds that cannot be customised. All requests must be completed within that time to avoid receiving HTTP 5xx errors.

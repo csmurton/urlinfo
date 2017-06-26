@@ -17,11 +17,12 @@ resource "aws_lambda_function" "urlinfo_lambda" {
   function_name    = "${var.project_name}"
   handler          = "url-info.handler"
   role             = "${aws_iam_role.urlinfo_lambda_role.arn}"
+  timeout          = "60"
   source_code_hash = "${data.archive_file.urlinfo_lambda.output_base64sha256}"
   runtime          = "nodejs6.10"
   vpc_config {
     security_group_ids = ["${aws_security_group.urlinfo_sg.id}"]
-    subnet_ids         = ["${data.aws_subnet_ids.default.ids}"]
+    subnet_ids         = ["${aws_subnet.urlinfo_subnet.id}"]
   }
 }
 
