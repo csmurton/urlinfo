@@ -8,6 +8,9 @@ This code is intended to be deployed within AWS to leverage API Gateway, ElastiC
 
 To deploy within AWS you should first download Terraform v0.9.4 or later: https://www.terraform.io/downloads.html
 
+To simplify the deployment process into AWS with Terraform all of the required NodeJS modules are distributed with this repository in `node/node_modules`.
+
+
 ## Getting started
 
 You'll first need to clone the repository and change into it:
@@ -57,11 +60,29 @@ You should download and install NodeJS 6.10+ and optionally Redis 3.2+ (https://
 
 URL Info is configured by the use of environment variables:
 
-| Variable          | Purpose                                                                  | Default   |
-| ----------------- | ------------------------------------------------------------------------ | --------- |
-| DATABASE_HOST     | The hostname or IP address of the database backend.                      | localhost |
-| DATABASE_PORT     | The port number on which the database backend is listening.              | 6379      |
-| DATABASE_PROVIDER | Sets the backend database provider. Currently only 'redis' is supported. | redis     |
-| LISTEN_PORT       | If running in standalone mode, this is the port the API will listen on.  | 5000      |
+| Variable                 | Purpose                                                                            | Default   |
+| ------------------------ | ---------------------------------------------------------------------------------- | --------- |
+| DATABASE_CONNECT_TIMEOUT | The amount of time (in milliseconds) to wait for a connection to the backend.      | 3000      |
+| DATABASE_HOST            | The hostname or IP address of the database backend.                                | localhost |
+| DATABASE_REQUEST_TIMEOUT | The amount of time (in milliseconds) to wait for a database request to complete.	| 10000     |
+| DATABASE_PORT            | The port number on which the database backend is listening.                        | 6379      |
+| DATABASE_PROVIDER        | Sets the backend database provider. Currently only 'redis' is supported.           | redis     |
+| LISTEN_PORT              | If running in standalone mode, this is the port the API will listen on.            | 5000      |
+| LOGGING_LOGLEVEL         | The verbosity of the logging printed to the console.                               | debug     |
 
-TODO.
+If you are comfortable with the defaults, run the following from the 'urlinfo' directory:
+
+```
+nodejs node/url-info.js
+```
+
+## Known limitations
+
+ * Error handling in the event of the Redis backend being unavailable due to timeout is incomplete.
+ * The only database provider currently supported is Redis but most backends that support CRUD operations should be suitable.
+
+
+## To-do
+
+ * Provide mechanism for importing of sample URL tokens to represent blacklisted paths
+
