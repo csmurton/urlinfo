@@ -54,7 +54,11 @@ Alternatively if you wish to make customisations such as the region:
 terraform apply -var 'aws_profile=<name-of-your-profile-defined-in-.aws-credentials>' -var 'aws_region=us-east-1'
 ```
 
-Once completed you should be presented with the API Gateway invocation path which takes the form https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev. Part of the Terraform provisioning process is to cause the API to seed the Redis backend with around ~3,000 'bad' URLs via a 3rd party blacklist.
+Part of the Terraform provisioning process is to cause the API to seed the Redis backend with around ~3,000 'bad' URLs via a 3rd party blacklist.
+
+Once completed you should be presented with the API Gateway invocation path which takes the form https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev. Suffix this with /urlinfo/1/XXXX to reach the API routes, i.e:
+
+https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev/urlinfo/1/www.badsite.com:80/badpath
 
 ### Standalone
 
