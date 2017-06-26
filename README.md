@@ -54,11 +54,11 @@ Alternatively if you wish to make customisations such as the region:
 terraform apply -var 'aws_profile=<name-of-your-profile-defined-in-.aws-credentials>' -var 'aws_region=us-east-1'
 ```
 
-Once completed you should be presented with the API Gateway invocation path which takes the form https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev.
+Once completed you should be presented with the API Gateway invocation path which takes the form https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev. Part of the Terraform provisioning process is to cause the API to seed the Redis backend with around ~3,000 'bad' URLs via a 3rd party blacklist.
 
 ### Standalone
 
-You should download and install NodeJS 6.10+ and optionally Redis 3.2+ (https://redis.io/download) to run a local in-memory database to hold the URL information.
+You should download and install NodeJS 6.10+ and Redis 3.2+ (https://redis.io/download) if you are not running it elsewhere so as to have a local in-memory database to hold the URL blacklist information.
 
 URL Info is configured by the use of environment variables:
 
