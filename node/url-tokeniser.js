@@ -15,7 +15,7 @@ class urlTokeniser {
 
 	tokenise(url) {
 		const token = crypto.createHash('md5').update(url).digest('hex');
-		this.logger.log('debug', 'Generating token ' + token + ' for URL ' + url);
+		this.logger.log('debug', 'Generating token %s for URL %s', token, url);
 
 		return token;
 	}

@@ -16,7 +16,7 @@ class UrlDatabase {
 			case "redis":
 				const redis = Promise.promisifyAll(require('redis'));
 
-				this.logger.log("debug", "Creating database connection with provider '" + config.Database.Provider + "', host = " + config.Database.Host + ":" + config.Database.Port);
+				this.logger.log("debug", "Creating database connection with provider '%s', host = %s:%s", config.Database.Provider, config.Database.Host, config.Database.Port);
 
 				this.database = redis.createClient({
 					host: config.Database.Host,
@@ -29,7 +29,7 @@ class UrlDatabase {
 				});
 
 				this.database.on("error", function (err) {
-					parent.logger.log("error", "Redis database provider error: " + err);
+					parent.logger.log("error", "Redis database provider error: %s", err);
 				});
 				break;
 			default:
@@ -39,18 +39,18 @@ class UrlDatabase {
 	}
 
 	get(token) {
-		this.logger.log("debug", "Querying database for token " + token);
+		this.logger.log("debug", "Querying database for token %s", token);
 
 		return Promise.resolve(this.database.getAsync(token));
 	}
 
 	set(token, value) {
-		this.logger.log("debug", "Updating database with token " + token + ", value = " + value);
+		this.logger.log("debug", "Updating database with token %s, value = %s", token, value);
 		return Promise.resolve(this.database.setAsync(token, value));
 	}
 
 	delete(token) {
-		this.logger.log("debug", "Deleting token " + token + " from database");
+		this.logger.log("debug", "Deleting token %s from database", token);
 		return Promise.resolve(this.database.deleteAsync(token));
 	}
 

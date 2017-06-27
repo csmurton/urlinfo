@@ -42,7 +42,7 @@ class urlLoader {
 		var blacklistTargetPath = '/tmp/blacklist';
 
 		return Promise.resolve().then(() => download(blacklistUrl, blacklistTargetPath, { 'extract': true }).then(() => {
-			parent.logger.log("Downloaded blacklist from " + blacklistUrl);
+			parent.logger.log("Downloaded blacklist from %s", blacklistUrl);
 
 			this._walk_directory(blacklistTargetPath, function(filepath, root, subdirectory, filename) {
 				var category = filepath.match(/.*\/([^\/]+)\/.*$/)[1];
@@ -71,8 +71,8 @@ class urlLoader {
 							const formattedUrl = url.format(urlParts[1] + ':80' + (urlParts[2] ? '/' + urlParts[2]: '/'));
 							const urlToken = parent.tokeniser.tokenise(formattedUrl);
 
-							parent.database.set(urlToken, '{ "category": ' + category + ' }').then(function(result) {
-								parent.logger.log("debug", "Adding token " + urlToken + " for " + formattedUrl + " to database");
+							parent.database.set(urlToken, '{ "category": "' + category + '" }').then(function(result) {
+								parent.logger.log("debug", "Adding token %s for %s to database", urlToken, formattedUrl);
 							});
 						}
 					});
