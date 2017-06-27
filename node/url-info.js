@@ -80,8 +80,15 @@ function urlInfoHandler(request, response, next) {
 				var malicious = true;
 
 				resolve(response.json({ 'malicious': malicious, metadata: result }));
-			} else if(tokenHost != tokenUrl) {
-				// Did not find our host token and the URL token is different; try the full URL's token
+			} else if(tokenHost == tokenUrl) {
+				// Did not find our host token and the URL token is identical
+
+				response.statusCode = 404;
+				var malicious = false;
+
+				resolve(response.json({ 'malicious': malicious, metadata: result }));
+			} else {
+				// Did not find our host token and the URL token is different; look up URL token
 
 				lookup.query(tokenUrl, formattedUrl).then(function(result) {
 					var malicious;
