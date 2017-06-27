@@ -79,14 +79,14 @@ function urlInfoHandler(request, response, next) {
 				response.statusCode = 200;
 				var malicious = true;
 
-				resolve(response.json({ 'malicious': malicious, metadata: result }));
+				resolve(response.json({ 'malicious': malicious, metadata: (result ? JSON.parse(result): result) }));
 			} else if(tokenHost == tokenUrl) {
 				// Did not find our host token and the URL token is identical
 
 				response.statusCode = 404;
 				var malicious = false;
 
-				resolve(response.json({ 'malicious': malicious, metadata: result }));
+				resolve(response.json({ 'malicious': malicious, metadata: (result ? JSON.parse(result): result) }));
 			} else {
 				// Did not find our host token and the URL token is different; look up URL token
 
@@ -105,7 +105,7 @@ function urlInfoHandler(request, response, next) {
 						malicious = false;
 					}
 
-					resolve(response.json({ 'malicious': malicious, metadata: result }));
+					resolve(response.json({ 'malicious': malicious, metadata: (result ? JSON.parse(result): result) }));
 				});
 			}
 		});
@@ -120,7 +120,7 @@ function urlInfoHandler(request, response, next) {
 }
 
 // Define routes
-app.get('/urlinfo/1/:host/:path?', urlInfoHandler);
+app.get('/urlinfo/1/:host/:path(*)?', urlInfoHandler);
 app.get('/urlloader', urlLoaderHandler);
 app.use(errorHandler);
 
