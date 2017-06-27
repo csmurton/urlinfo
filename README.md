@@ -4,7 +4,7 @@ A REST API providing a simple method to advise upstream clients (i.e. proxies) w
 
 ## Prerequisites
 
-This code is intended to be deployed within AWS to leverage API Gateway, ElastiCache and Lambda but can also be run as a standalone webserver under Node 6.10+. You will also need a Git client installed on your system.
+This code is intended to be deployed within AWS to leverage API Gateway, ElastiCache and Lambda but can also be run inside a Docker container or as a standalone webserver under NodeJS 4.2.6+. You will also need a Git client installed on your system.
 
 To deploy within AWS you should first download Terraform v0.9.4 or later: https://www.terraform.io/downloads.html
 
@@ -60,9 +60,18 @@ Once completed you should be presented with the API Gateway invocation path whic
 
 https://xxxxxxxxxx.execute-api.eu-west-1.amazonaws.com/dev/urlinfo/1/www.badsite.com:80/badpath
 
-### Standalone
+### Docker
 
-You should download and install NodeJS 6.10+ and Redis 3.2+ (https://redis.io/download) if you are not running it elsewhere so as to have a local in-memory database to hold the URL blacklist information.
+From the root of the repository, run the following commands to build and then start the service in a container running on localhost:5000:
+
+```
+docker build -t csmurton/urlinfo:latest .
+docker run -p 127.0.0.1:5000:5000 csmurton/urlinfo:latest
+```
+
+If desired you should now seed the Redis server running in the container with sample data by browsing to http://localhost:5000/urlloader. Note: Your client should have unrestricted outbound port 80 access for this to succeed.
+
+## Configuration
 
 URL Info is configured by the use of environment variables:
 
@@ -76,22 +85,9 @@ URL Info is configured by the use of environment variables:
 | LISTEN_PORT              | If running in standalone mode, this is the port the API will listen on.            | 5000      |
 | LOGGING_LOGLEVEL         | The verbosity of the logging printed to the console.                               | debug     |
 
-If you are comfortable with the defaults, run the following from the 'urlinfo' directory:
-
-```
-nodejs node/url-info.js
-```
-
-To seed your configured Redis instance with a demonstration URL blocklist, run:
-
-```
-curl http://localhost:5000/urlloader
-{"message":"URLs imported to database successfully."}
-```
 
 ## Known limitations
 
- * Error handling in the event of the Redis backend being unavailable due to timeout is incomplete.
  * The only database provider currently supported is Redis but most backends that support CRUD operations should be suitable.
  * A simple, functional API route and piece of code to load sample data into the Redis backend has been included. In production this would be handled separately and/or improved to stream the blacklist entries to Redis thereby reducing memory footprint during the loading exercise.
  * AWS API Gateway has an integration timeout of 30 seconds that cannot be customised. All requests must be completed within that time to avoid receiving HTTP 5xx errors.
