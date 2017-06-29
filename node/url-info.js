@@ -11,6 +11,7 @@ const UrlTokeniser = require('./url-tokeniser')
 const UrlDatabase = require('./url-database')
 const UrlLookup = require('./url-lookup')
 const UrlLoader = require('./url-loader')
+const UrlValidator = require('./url-validator')
 
 const app = express();
 const server = awsServerlessExpress.createServer(app);
@@ -26,9 +27,10 @@ logger.configure({
 });
 
 const tokeniser = new UrlTokeniser(logger);
+const validator = new UrlValidator(logger);
 const database = new UrlDatabase(config, logger, Promise);
 const lookup = new UrlLookup(config, logger, database);
-const loader = new UrlLoader(config, logger, database, tokeniser);
+const loader = new UrlLoader(config, logger, database, validator, tokeniser);
 
 function errorHandler(err, req, res, next) {
 	res.status(500).json({'error': err });
@@ -69,50 +71,55 @@ function urlInfoHandler(request, response, next) {
 	const formattedHost = url.format(reqHost + '/');
 	const tokenHost = tokeniser.tokenise(formattedHost);
 
-	/* Attempt a database lookup for the token for host only */
-
 	return new Promise(function (resolve, reject) {
-		lookup.query(tokenHost, formattedHost).then(function(result) {
-			if(result) {
-				// Found our host token. Request is malicious.
+		if(!validator.validate(formattedUrl)) {
+			response.statusCode = 400;
+			resolve(response.json({'error': 'The URL provided is not syntactically valid. Expected format is "host:port/path"'}));
+		} else {
+			/* Attempt a database lookup for the token for host only */
 
-				response.statusCode = 200;
-				var malicious = true;
+			lookup.query(tokenHost, formattedHost).then(function(result) {
+				if(result) {
+					// Found our host token. Request is malicious.
+					response.statusCode = 200;
+					var malicious = true;
 
-				resolve(response.json({ 'malicious': malicious, metadata: (result ? JSON.parse(result): result) }));
-			} else if(tokenHost == tokenUrl) {
-				// Did not find our host token and the URL token is identical
+					resolve(response.json({ 'malicious': malicious, 'metadata': (result ? JSON.parse(result): result) }));
+				} else if(tokenHost == tokenUrl) {
+					// Did not find our host token and the URL token is identical
 
-				response.statusCode = 404;
-				var malicious = false;
+					response.statusCode = 404;
+					var malicious = false;
 
-				resolve(response.json({ 'malicious': malicious, metadata: (result ? JSON.parse(result): result) }));
-			} else {
-				// Did not find our host token and the URL token is different; look up URL token
+					resolve(response.json({ 'malicious': malicious, 'metadata': (result ? JSON.parse(result): result) }));
+				} else {
+					// Did not find our host token and the URL token is different; look up URL token
 
-				lookup.query(tokenUrl, formattedUrl).then(function(result) {
-					var malicious;
+					lookup.query(tokenUrl, formattedUrl).then(function(result) {
+						var malicious;
 
-					if(result) {
-						// Found our full URL's token. Request is malicious.
+						if(result) {
+							// Found our full URL's token. Request is malicious.
 
-						response.statusCode = 200;
-						malicious = true;
-					} else {
-						// Did not find our full URL's token. Request is not malicious.
+							response.statusCode = 200;
+							malicious = true;
+						} else {
+							// Did not find our full URL's token. Request is not malicious.
 
-						response.statusCode = 404;
-						malicious = false;
-					}
+							response.statusCode = 404;
+							malicious = false;
+						}
 
-					resolve(response.json({ 'malicious': malicious, metadata: (result ? JSON.parse(result): result) }));
-				});
-			}
-		});
+						resolve(response.json({ 'malicious': malicious, 'metadata': (result ? JSON.parse(result): result) }));
+					});
+				}
+			});
+		}
 	})
 	.timeout(config.Database.RequestTimeout)
 	.catch(Promise.TimeoutError, function(err) {
 		// Timeout waiting for a response from the database backend.
+		logger.log('error', 'Database backend did not respond within %s milliseconds, sending error response', config.Database.RequestTimeout);
 
 		response.statusCode = 503;
 		response.json({ 'error': 'A response was not received within the timeframe. Please try again later.' });

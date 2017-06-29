@@ -15,9 +15,10 @@ const url = require('url');
 */
 
 class urlLoader {
-	constructor(config, logger, database, tokeniser) {
+	constructor(config, logger, database, validator, tokeniser) {
 		this.logger = logger;
 		this.database = database;
+		this.validator = validator;
 		this.tokeniser = tokeniser;
 	}
 
@@ -40,9 +41,15 @@ class urlLoader {
 		var parent = this;
 		var blacklistUrl = 'http://urlblacklist.com/cgi-bin/commercialdownload.pl?type=download&file=smalltestlist';
 		var blacklistTargetPath = '/tmp/blacklist';
+		var fakeUrl = 'url-info-test.fake:80/test.html';
 
 		return Promise.resolve().then(() => download(blacklistUrl, blacklistTargetPath, { 'extract': true }).then(() => {
 			parent.logger.log("Downloaded blacklist from %s", blacklistUrl);
+
+			// Add a fake URL token to the database for unit testing
+			parent.database.set(this.tokeniser.tokenise(fakeUrl), '{ "category": "dummy" }').then(function(result) {
+				parent.logger.log("debug", "Adding test token to the database");
+			});
 
 			this._walk_directory(blacklistTargetPath, function(filepath, root, subdirectory, filename) {
 				var category = filepath.match(/.*\/([^\/]+)\/.*$/)[1];
@@ -69,11 +76,16 @@ class urlLoader {
 							// port numbers but our API expects it to be provided.
 
 							const formattedUrl = url.format(urlParts[1] + ':80' + (urlParts[2] ? '/' + urlParts[2]: '/'));
-							const urlToken = parent.tokeniser.tokenise(formattedUrl);
 
-							parent.database.set(urlToken, '{ "category": "' + category + '" }').then(function(result) {
-								parent.logger.log("debug", "Adding token %s for %s to database", urlToken, formattedUrl);
-							});
+							if(!parent.validator.validate(formattedUrl)) {
+								parent.logger.log("debug", "Not adding token for URL %s as it did not pass validation", formattedUrl);
+							} else {
+								const urlToken = parent.tokeniser.tokenise(formattedUrl);
+
+								parent.database.set(urlToken, '{ "category": "' + category + '" }').then(function(result) {
+									parent.logger.log("debug", "Adding token %s for %s to database", urlToken, formattedUrl);
+								});
+							}
 						}
 					});
 				});
