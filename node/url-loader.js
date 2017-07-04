@@ -75,7 +75,7 @@ class urlLoader {
 							// Add :80 here because source blacklist doesn't contain
 							// port numbers but our API expects it to be provided.
 
-							const formattedUrl = url.format(urlParts[1] + ':80' + (urlParts[2] ? '/' + urlParts[2]: '/'));
+							const formattedUrl = url.format(urlParts[1].toLowerCase() + ':80' + (urlParts[2] ? '/' + urlParts[2]: '/'));
 
 							if(!parent.validator.validate(formattedUrl)) {
 								parent.logger.log("debug", "Not adding token for URL %s as it did not pass validation", formattedUrl);
