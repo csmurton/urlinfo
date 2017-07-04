@@ -86,8 +86,19 @@ URL Info is configured by the use of environment variables:
 | LOGGING_LOGLEVEL         | The verbosity of the logging printed to the console.                               | debug     |
 
 
+## Testing
+
+Unit testing for functionality that doesn't require a database backend to be present has been included using the Mocha framework. To run these tests, from your 'urlinfo' directory:
+```
+cd node/
+npm install && npm test
+```
+
 ## Known limitations
 
  * The only database provider currently supported is Redis but most backends that support CRUD operations should be suitable.
  * A simple, functional API route and piece of code to load sample data into the Redis backend has been included. In production this would be handled separately and/or improved to stream the blacklist entries to Redis thereby reducing memory footprint during the loading exercise.
  * AWS API Gateway has an integration timeout of 30 seconds that cannot be customised. All requests must be completed within that time to avoid receiving HTTP 5xx errors.
+ * The unit tests do not check for the presence/absence of particular URLs because there is no guarantee the database backend is present.
+ * The host portion of the request URL is deliberately lowercased for tokenisation but the path is not, as most *nix based webservers expect path to be case sensitive.
+
