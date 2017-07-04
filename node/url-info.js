@@ -57,7 +57,7 @@ function urlLoaderHandler(request, response, next) {
 }
 
 function urlInfoHandler(request, response, next) {
-	const reqHost = request.params.host;
+	const reqHost = request.params.host.toLowerCase();
 	const reqPath = request.params.path;
 
 	logger.log('debug', 'Received urlInfo request for host %s and path %s', reqHost, (reqPath ? reqPath: 'none'));
@@ -130,6 +130,9 @@ function urlInfoHandler(request, response, next) {
 app.get('/urlinfo/1/:host/:path(*)?', urlInfoHandler);
 app.get('/urlloader', urlLoaderHandler);
 app.use(errorHandler);
+
+// Export the Express app for use in unit tests
+exports.app = app;
 
 // Provider a 'handler' export to be used by AWS Lambda if invoked in this way.
 exports.handler = (event, context) => awsServerlessExpress.proxy(server, event, context);
